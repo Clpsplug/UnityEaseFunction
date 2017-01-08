@@ -1,93 +1,98 @@
 using System;
-﻿using UnityEngine;
 using System.Collections;
 
 public static class EaseFunctions {
 
 	/// <summary>
-	/// 直線補完型イージング関数
+	/// Linear Ease Functions
 	/// </summary>
-	/// <param name="start">始点値</param>
-	/// <param name="end">終点値</param>
-	/// <param name="current">現在の進行度</param>
-	/// <param name="max">進行度の最大値</param>
-	/// <param name="overshoot">maxを超えるcurrentが設定された場合に、終点を超えて良い場合はTrue</param>
-	/// <param name="undershoot">0を下回るcurrentが設定された場合に、始点を超えて良い場合はTrue</param>
-	/// <returns>入力値に基づいた数値が返ってきます</returns>
+	/// <param name="start">Beginning Value</param>
+	/// <param name="end">Ending Value</param>
+	/// <param name="current">Current Progress (against Max)</param>
+	/// <param name="max">Maximum Progress</param>
+	/// <param name="overshoot">True to allow the return to exceed ending value, when current > max</param>
+	/// <param name="undershoot">True to allow the return to fall behind 0, when current < 0</param>
+	/// <returns>Value between start and end, based on the progression</returns>
 	public static float Linear(double start, double end, double current, double max, bool overshoot, bool undershoot)
-		{
+	{
 
-			float rate = (float)(current / max);
-			if (!overshoot) {
-				rate = rate > 1.0f ? 1.0f : rate;
-			}
-			if (!undershoot) {
-				rate = rate < 0.0f ? 0.0f : rate;
-			}
-			return (float)(start + (end-start) * rate);
+		float rate = (float)(current / max);
+		if (!overshoot) {
+			rate = rate > 1.0f ? 1.0f : rate;
+		}
+		if (!undershoot) {
+			rate = rate < 0.0f ? 0.0f : rate;
+		}
+		return (float)(start + (end-start) * rate);
 
+	}
+
+	/// <summary>
+	/// Monomial Shaping Ease Function (Accelerated)
+	/// </summary>
+	/// <param name="start">Beginning Value</param>
+	/// <param name="end">Ending Value</param>
+	/// <param name="power">Progression will be raised by this.</param>
+	/// <param name="current">Current Progress (against Max)</param>
+	/// <param name="max">Maximum Progress</param>
+	/// <param name="overshoot">True to allow the return to exceed ending value, when current > max</param>
+	/// <param name="undershoot">True to allow the return to fall behind 0, when current < 0</param>
+	/// <returns>Value between start and end, based on the progression</returns>
+	/// <remarks>Difference between Linear is that this function will raise the progression by power parameter. This also applies if overshoot / undershoot is true. If current falls behind 0 when undershoot is true, it returns the value when you give the absolute of current - except for it being backwards.</remarks>
+	public static float EaseIn(double start, double end, double power, double current, double max, bool overshoot, bool undershoot) {
+
+		float rate = 0.0f;
+		// When rate is not integer, rate less than 0 will wreak havoc because it will fall into complex value,
+		// which case we will use it's absolute.
+		if (!undershoot) {
+			rate = current < 0.0f ? 0.0f : (float)Math.Pow((Math.Abs(current) / max), power);
+		}
+		else {
+			rate = (float)Math.Pow((Math.Abs(current) / max), power);
+		}
+		if (!overshoot) {
+			rate = rate > 1.0f ? 1.0f : rate;
 		}
 
-		/// <summary>
-		/// 整関数補完型イージング関数(加速)
-		/// </summary>
-		/// <param name="start">始点値</param>
-		/// <param name="end">終点値</param>
-		/// <param name="power">指数</param>
-		/// <param name="current">現在の進行度</param>
-		/// <param name="max">進行度の最大値</param>
-		/// <param name="overshoot">maxを超えるcurrentが設定された場合に、終点を超えて良い場合はTrue</param>
-		/// <param name="undershoot">0を下回るcurrentが設定された場合に、始点を超えて良い場合はTrue</param>
-		/// <returns>入力値に基づいた数値が返ってきます</returns>
-		/// <remarks>Linearとの違いは、進行度の計算時にその数値を底としてpower乗することです。overshoot/undershootをtrueにした場合でも整関数補完は効きます。また、アンダーシュートした場合は、補完は現在地の絶対値分をcurrentとした場合と同じように効きます(ただし、逆側に動きます)</remarks>
-		public static float EaseIn(double start, double end, double power, double current, double max, bool overshoot, bool undershoot) {
+		// if rate < 0 when undershoot, move it backwards.
+		return (float)(start + (end-start) * rate * (current >= 0 ? 1 : -1));
 
-			float rate = 0.0f;
-			// rateに非整数を入れると、currentが-の時に虚数の世界に突入してとんでもないことになる
-			// そこで、絶対値を利用することとする
-			if (!undershoot) {
-				rate = current < 0.0f ? 0.0f : (float)Math.Pow((Math.Abs(current) / max), power);
-			}
-			else {
-				rate = (float)Math.Pow((Math.Abs(current) / max), power);
-			}
-			if (!overshoot) {
-				rate = rate > 1.0f ? 1.0f : rate;
-			}
+	}
 
-			return (float)(start + (end-start) * rate * (current >= 0 ? 1 : -1));
+	/// <summary>
+	/// Monomial Shaping Ease Function (Decelerated)
+	/// </summary>
+	/// <param name="start">Beginning Value</param>
+	/// <param name="end">Ending Value</param>
+	/// <param name="power">Progression will be raised by reciprocal of this. This can't be 0!</param>
+	/// <param name="current">Current Progress (against Max)</param>
+	/// <param name="max">Maximum Progress</param>
+	/// <param name="overshoot">True to allow the return to exceed ending value, when current > max</param>
+	/// <param name="undershoot">True to allow the return to fall behind 0, when current < 0</param>
+	/// <returns>Value between start and end, based on the progression</returns>
+	/// <remarks>Difference between Linear is that this function will raise the progression by reciprocal of power parameter. This also applies if overshoot / undershoot is true. If current falls behind 0 when undershoot is true, it returns the value when you give the absolute of current - except for it being backwards.</remarks>
+	public static float EaseOut(double start, double end, double power, double current, double max, bool overshoot, bool undershoot) {
 
+		if (power == 0.0f) {
+			throw new System.ArgumentException("Power cannot be 0!", "power");
 		}
 
-		/// <summary>
-		/// 整関数補完型イージング関数(減速)
-		/// </summary>
-		/// <param name="start">始点値</param>
-		/// <param name="end">終点値</param>
-		/// <param name="power">指数</param>
-		/// <param name="current">現在の進行度</param>
-		/// <param name="max">進行度の最大値</param>
-		/// <param name="overshoot">maxを超えるcurrentが設定された場合に、終点を超えて良い場合はTrue</param>
-		/// <param name="undershoot">0を下回るcurrentが設定された場合に、始点を超えて良い場合はTrue</param>
-		/// <returns>入力値に基づいた数値が返ってきます</returns>
-		/// <remarks>Linearとの違いは、進行度の計算時にその数値を底としてpower乗することです。overshoot/undershootをtrueにした場合でも整関数補完は効きます。また、アンダーシュートした場合は、補完は現在地の絶対値分をcurrentとした場合と同じように効きます(ただし、逆側に動きます)</remarks>
-		public static float EaseOut(double start, double end, double power, double current, double max, bool overshoot, bool undershoot) {
-
-			float rate = 0.0f;
-			// rateに非整数を入れると、currentが-の時に虚数の世界に突入してとんでもないことになる
-			// そこで、絶対値を利用することとする
-			if (!undershoot) {
-				rate = current < 0.0f ? 0.0f : (float)Math.Pow((Math.Abs(current) / max), 1 / power);
-			}
-			else {
-				rate = (float)Math.Pow((Math.Abs(current) / max), 1 / power);
-			}
-			if (!overshoot) {
-				rate = rate > 1.0f ? 1.0f : rate;
-			}
-
-			return (float)(start + (end-start) * rate * (current >= 0 ? 1 : -1));
-
+		float rate = 0.0f;
+		// When rate is not integer, rate less than 0 will wreak havoc because it will fall into complex value,
+		// which case we will use it's absolute.
+		if (!undershoot) {
+			rate = current < 0.0f ? 0.0f : (float)Math.Pow((Math.Abs(current) / max), 1 / power);
 		}
+		else {
+			rate = (float)Math.Pow((Math.Abs(current) / max), 1 / power);
+		}
+		if (!overshoot) {
+			rate = rate > 1.0f ? 1.0f : rate;
+		}
+
+		// if rate < 0 when undershoot, move it backwards.
+		return (float)(start + (end-start) * rate * (current >= 0 ? 1 : -1));
+
+	}
 
 }
