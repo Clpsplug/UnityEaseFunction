@@ -1,3 +1,9 @@
+////////////////////////////////////////
+// EaseFunctions.cs                   //
+// Created by Collapsed Plug          //
+// Github: clpsplug                   //
+////////////////////////////////////////
+
 using System;
 using System.Collections;
 
@@ -35,11 +41,12 @@ public static class EaseFunctions {
 	/// <param name="power">Progression will be raised by this.</param>
 	/// <param name="current">Current Progress (against Max)</param>
 	/// <param name="max">Maximum Progress</param>
-	/// <param name="overshoot">True to allow the return to exceed ending value, when current > max</param>
+	/// <param name="overshoot">True to allow the return to exceed ending value, when current > max.</param>
 	/// <param name="undershoot">True to allow the return to fall behind 0, when current < 0</param>
 	/// <returns>Value between start and end, based on the progression</returns>
 	/// <remarks>Difference between Linear is that this function will raise the progression by power parameter. This also applies if overshoot / undershoot is true. If current falls behind 0 when undershoot is true, it returns the value when you give the absolute of current - except for it being backwards.</remarks>
-	public static float EaseIn(double start, double end, double power, double current, double max, bool overshoot, bool undershoot) {
+	public static float EaseIn(double start, double end, double power, double current, double max, bool overshoot, bool undershoot)
+	{
 
 		float rate = 0.0f;
 		// When rate is not integer, rate less than 0 will wreak havoc because it will fall into complex value,
@@ -70,8 +77,9 @@ public static class EaseFunctions {
 	/// <param name="overshoot">True to allow the return to exceed ending value, when current > max</param>
 	/// <param name="undershoot">True to allow the return to fall behind 0, when current < 0</param>
 	/// <returns>Value between start and end, based on the progression</returns>
-	/// <remarks>Difference between Linear is that this function will raise the progression by reciprocal of power parameter. This also applies if overshoot / undershoot is true. If current falls behind 0 when undershoot is true, it returns the value when you give the absolute of current - except for it being backwards.</remarks>
-	public static float EaseOut(double start, double end, double power, double current, double max, bool overshoot, bool undershoot) {
+	/// <remarks>Difference between Linear is that this function will use the power-th root of the progression. This also applies if overshoot / undershoot is true. If current falls behind 0 when undershoot is true, it returns the value when you give the absolute of current - except for it being backwards.</remarks>
+	public static float EaseOut(double start, double end, double power, double current, double max, bool overshoot, bool undershoot)
+	{
 
 		if (power == 0.0f) {
 			throw new System.ArgumentException("Power cannot be 0!", "power");
