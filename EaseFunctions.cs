@@ -1,8 +1,10 @@
-////////////////////////////////////////
-// EaseFunctions.cs                   //
-// Created by Collapsed Plug          //
-// Github: clpsplug                   //
-////////////////////////////////////////
+////////////////////////////////////////////////////
+// EaseFunctions.cs                               //
+// Created by Collapsed Plug                      //
+// Github: clpsplug                               //
+// Released under the MIT license                 //
+// http://opensource.org/licenses/mit-license.php //
+////////////////////////////////////////////////////
 
 using System;
 using System.Collections;

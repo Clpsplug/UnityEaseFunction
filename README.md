@@ -46,4 +46,4 @@ Just put the `EaseFunctions.cs` into Assets folder and it should work!
 
 # License
 
-Considering, defenitely will be adding one in - stay tight
+MIT License
