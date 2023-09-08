@@ -8,7 +8,7 @@
 
 using System;
 
-namespace ExplodingCable.Interpolator
+namespace ExplodingCable.Interpolators
 {
 	/// <summary>
 	/// Static Ease Function Collection
