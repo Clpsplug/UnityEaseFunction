@@ -53,7 +53,7 @@ namespace ExplodingCable.Interpolators.Test
         public void CanPerformDirectInterpolation()
         { 
             var interpolator = new Interpolator(0, 100);
-            AreEqual(50, interpolator.Get(50, 100), "0-100 Direct interpolation 0.5 = 50");
+            AreEqual(50, interpolator.Interpolate(0.5), "0-100 Direct interpolation 0.5 = 50");
         }
         
         private void AreEqual(double expected, double actual, string mes)
